@@ -87,6 +87,51 @@ struct Node * findFloor(struct Node * x, char key) {
 	return x;
 }
 
+struct Node * deleteMin(struct Node * x) {
+	if (x->left == NULL)
+		return x->right;
+	x->left = deleteMin(x->left);
+	x->count = 1 + size(x->left) + size(x->right);
+
+	return x;
+}
+
+struct Node * min(struct Node * x) {
+	if (x->left == NULL)
+		return x;
+	x = min(x->left);
+
+	return x;
+}
+
+struct Node * delete(struct Node * x, char key) {
+	int cmp;
+	struct Node * t;
+
+	if (x == NULL) 
+		return NULL;
+	cmp = key - x->key;
+	if (cmp < 0)
+		x->left = delete(x->left, key);//search for key
+	else if (cmp > 0)
+		x->right = delete(x->right, key);//search for key
+	else if (cmp == 0) {//find the key
+		printf("Delete node %c = %d\n", x->key, x->val);
+
+		if (x->right == NULL) {
+			printf("x-> == NULL\n");
+			return x->left;
+		}
+		t = x;
+		x = min(t->right);
+		x->right = deleteMin(t->right);
+		x->left = t->left;
+	}
+	x->count = size(x->left) + size(x->right) + 1;//update subtree count
+
+	return x;
+}
+
 main () {
 	char keys[] = {'S', 'E', 'A', 'R', 'C', 'H', 'E', 'X', \
 		'A', 'M', 'P', 'L', 'E'};
@@ -94,13 +139,17 @@ main () {
 	struct Node * root = NULL, * p;
 	int i;
 
+	/*add new nodes to the tree*/
 	for (i = 0; i < LEN; i++) {
 		root = put(root, keys[i], values[i]);
 	}
+
+	printf("before deletion\n");
+	treeprint(root);
+	/*p = deleteMin(root);*/
+	p = delete(root, 'E');
+	printf("after deletion:\n");
 	treeprint(root);
 
-	/*find floor function*/
-	/*p = findFloor(root, 'F');*/
-	/*printf("F's findFloor is %c = %d\n", p->key, p->val);*/
 	return 0;
 }
